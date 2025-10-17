@@ -12,11 +12,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class StorageServiceTest {
 
     private StorageService storageService;
+    private WALService walService;
 
     // This method runs before each test, ensuring a clean state
     @BeforeEach
     void setUp() {
-        storageService = new StorageService();
+        // 1. Create the dependency first.
+        walService = new WALService();
+        // 2. Manually call the PostConstruct method because Spring doesn't run in this test.
+        walService.init();
+        // 3. Provide the dependency to the StorageService constructor.
+        storageService = new StorageService(walService);
         storageService.createTable("Users", "userId");
     }
 
