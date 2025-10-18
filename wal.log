@@ -1,3 +1,5 @@
 {"operationType":"PUT_ITEM","tableName":"Users","item":{"primaryKey":{"partitionKey":"user123"},"attributes":{"name":"Alice","userId":"user123"}}}
 {"operationType":"PUT_ITEM","tableName":"Users","item":{"primaryKey":{"partitionKey":"user_to_delete"},"attributes":{"userId":"user_to_delete"}}}
 {"operationType":"DELETE_ITEM","tableName":"Users","item":{"primaryKey":{"partitionKey":"user_to_delete"},"attributes":{"userId":"user_to_delete"}}}
+{"operationType":"PUT_ITEM","tableName":"Users","item":{"primaryKey":{"partitionKey":"user123"},"attributes":{"userId":"user123","name":"Samarth","city":"Pimpri-Chinchwad","timestamp":"{{$datetime iso8601}}"}}}
+{"operationType":"DELETE_ITEM","tableName":"Users","item":{"primaryKey":{"partitionKey":"user123"},"attributes":{"userId":"user123","name":"Samarth","city":"Pimpri-Chinchwad","timestamp":"{{$datetime iso8601}}"}}}
