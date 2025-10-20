@@ -65,16 +65,22 @@ public class StorageService {
      * This logic is used by the startup replay.
      */
     private void applyLogEntry(WALEntry entry) {
-        // We need to ensure the table exists, but we don't have its key info here.
-        // For simplicity, we'll assume the table exists. A more robust implementation
-        // might log table creation too. For now, we manually create tables.
-        if(entry.operationType() == OperationType.PUT_ITEM) {
-            // We're calling a new private method to avoid re-writing to the WAL.
+        if (entry.operationType() == OperationType.CREATE_TABLE) {
+            // Call the "Librarian" directly to avoid re-logging.
+            performCreateTable(entry.tableName(), entry.partitionKeyName(), entry.sortKeyName());
+        } else if (entry.operationType() == OperationType.PUT_ITEM) {
             performPut(entry.tableName(), entry.item());
-        } else if(entry.operationType() == OperationType.DELETE_ITEM) {
+        } else if (entry.operationType() == OperationType.DELETE_ITEM) {
             Key key = entry.item().getPrimaryKey();
-            performDelete(entry.tableName(), key.getPartitionKey(), key.getSortKey());
+            if (key != null) {
+                performDelete(entry.tableName(), key.getPartitionKey(), key.getSortKey());
+            }
         }
+    }
+
+    private void performCreateTable(String tableName, String partitionKeyName, String sortKeyName) {
+        tables.put(tableName, new Table(tableName, partitionKeyName, sortKeyName));
+        System.out.println("Table '" + tableName + "' replayed/created successfully.");
     }
 
     private Table getTable(String tableName) {
@@ -88,17 +94,19 @@ public class StorageService {
     }
 
     public void createTable(String tableName, String partitionKeyName, String sortKeyName) {
-        if(tables.containsKey(tableName)) {
+        // Log the operation BEFORE changing the in-memory state.
+        // We only log if the table doesn't already exist to avoid a cluttered log.
+        if (!tables.containsKey(tableName)) {
+            walService.log(WALEntry.forTable(tableName, partitionKeyName, sortKeyName));
+            tables.put(tableName, new Table(tableName, partitionKeyName, sortKeyName));
+            System.out.println("Table '" + tableName + "' created successfully.");
+        } else {
             System.out.println("Table '" + tableName + "' already exists.");
-            return;
         }
-
-        tables.put(tableName, new Table(tableName, partitionKeyName, sortKeyName));
-        System.out.println("Table '" + tableName + "' created successfully.");
     }
 
     public Item putItem(String tableName, Item item) {
-        walService.log(new WALEntry(OperationType.PUT_ITEM, tableName, item));
+        walService.log(WALEntry.forItem(OperationType.PUT_ITEM, tableName, item));
         return performPut(tableName, item);
     }
 
@@ -114,7 +122,7 @@ public class StorageService {
     public void deleteItem(String tableName, String partitionKey, String sortKey) {
         Optional<Item> itemToDelete = getItem(tableName, partitionKey, sortKey);
         itemToDelete.ifPresent(item -> {
-            walService.log(new WALEntry(OperationType.DELETE_ITEM, tableName, item));
+            walService.log(WALEntry.forItem(OperationType.DELETE_ITEM, tableName, item));
             performDelete(tableName, partitionKey, sortKey);
         });
     }
