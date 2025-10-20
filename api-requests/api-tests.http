@@ -1,71 +1,91 @@
 ###
-# JavaDynamo API Test Collection
+# JKeyDB API Test Collection
 #
-# A collection of HTTP requests to test the JavaDynamo database.
-# Click the green "play" icon next to each request to run it individually.
+# Now updated to test composite keys (Partition Key + Sort Key).
 ###
 
 # --- Environment Variables ---
-# Define variables here to make requests reusable.
 @baseUrl = http://localhost:8080/api/v1
-@tableName = Users
-@partitionKeyName = userId
-@userId = user123
-@nonExistentUserId = user999
 @contentType = application/json
 
+# Our new table schema
+@tableName = Music
+@partitionKeyName = Artist
+@sortKeyName = SongTitle
+
+# Data for our first item
+@pkValue1 = Daft Punk
+@skValue1 = One More Time
+
+# Data for our second item (same artist, different song)
+# CORRECT: The values do NOT have quotes around them here.
+@pkValue2 = Daft Punk
+@skValue2 = Harder Better Faster Stronger
+
+
 ### --------------------------------------------------
-# 1. Create a table named 'Users'
+# 1. Create a table with a composite key
 #
-# Sends a POST request to create a new table.
-# Expects a 201 Created response.
+# Now we must provide both partitionKeyName and sortKeyName.
 POST {{baseUrl}}/tables
 Content-Type: {{contentType}}
 
 {
   "tableName": "{{tableName}}",
-  "partitionKeyName": "{{partitionKeyName}}"
+  "partitionKeyName": "{{partitionKeyName}}",
+  "sortKeyName": "{{sortKeyName}}"
 }
 
 ### --------------------------------------------------
-# 2. Add an item for a new user
+# 2. Add the first song for Daft Punk
 #
-# Sends a POST request to add an item to the 'Users' table.
-# Expects a 200 OK response with the created item.
+# The request body MUST contain attributes for both keys.
 POST {{baseUrl}}/tables/{{tableName}}/items
 Content-Type: {{contentType}}
 
 {
-  "{{partitionKeyName}}": "{{userId}}",
-  "name": "Samarth",
-  "city": "Pimpri-Chinchwad",
-  "timestamp": "{{$datetime iso8601}}"
+  "{{partitionKeyName}}": "{{pkValue1}}",
+  "{{sortKeyName}}": "{{skValue1}}",
+  "Album": "Discovery",
+  "Year": 2001
 }
 
 ### --------------------------------------------------
-# 3. Get the item for 'user123'
+# 3. Add a second song for the SAME artist
 #
-# Sends a GET request to retrieve the item we just created.
-# Expects a 200 OK response with the item's data.
-GET {{baseUrl}}/tables/{{tableName}}/items/{{userId}}
+# This demonstrates storing multiple items under the same partition key.
+POST {{baseUrl}}/tables/{{tableName}}/items
+Content-Type: {{contentType}}
+
+{
+  "{{partitionKeyName}}": "{{pkValue2}}",
+  "{{sortKeyName}}": "{{skValue2}}",
+  "Album": "Discovery",
+  "Year": 2001
+}
 
 ### --------------------------------------------------
-# 4. Try to get a non-existent item
+# 4. Get a specific item using both keys
 #
-# Sends a GET request for a key that does not exist.
-# Expects a 404 Not Found response.
-GET {{baseUrl}}/tables/{{tableName}}/items/{{nonExistentUserId}}
+# The URL now requires both the partition key and sort key.
+# Note: Spaces in URLs should be encoded as %20 or +. The HTTP client handles this.
+GET {{baseUrl}}/tables/{{tableName}}/items/{{pkValue1}}/{{skValue1}}
 
 ### --------------------------------------------------
-# 5. Delete the item for 'user123'
+# 5. Delete a specific item
 #
-# Sends a DELETE request to remove the item.
-# Expects a 204 No Content response.
-DELETE {{baseUrl}}/tables/{{tableName}}/items/{{userId}}
+# The DELETE endpoint also requires both keys.
+DELETE {{baseUrl}}/tables/{{tableName}}/items/{{pkValue1}}/{{skValue1}}
 
 ### --------------------------------------------------
 # 6. Verify the item is gone
 #
-# Sends another GET request for the deleted user.
-# Expects a 404 Not Found response, confirming deletion.
-GET {{baseUrl}}/tables/{{tableName}}/items/{{userId}}
+# This request should now return a 404 Not Found.
+GET {{baseUrl}}/tables/{{tableName}}/items/{{pkValue1}}/{{skValue1}}
+
+### --------------------------------------------------
+# 7. Verify the other item still exists
+#
+# This GET request should still work and return a 200 OK.
+GET {{baseUrl}}/tables/{{tableName}}/items/{{pkValue2}}/{{skValue2}}
+

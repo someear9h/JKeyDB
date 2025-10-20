@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode // Important for using this as a key in a Map
 public class Key {
     private String partitionKey;
-    // We will add sortKey here on Day 5
+    private String sortKey;
 }

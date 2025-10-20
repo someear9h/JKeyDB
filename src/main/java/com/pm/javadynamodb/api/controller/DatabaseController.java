@@ -26,7 +26,11 @@ public class DatabaseController {
     // POST http://localhost:8080/api/v1/tables
     @PostMapping("/tables")
     public ResponseEntity<Void> createTable(@RequestBody CreateTableRequest request) {
-        storageService.createTable(request.getTableName(), request.getPartitionKeyName());
+        storageService.createTable(
+                request.getTableName(),
+                request.getPartitionKeyName(),
+                request.getSortKeyName());
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -44,12 +48,13 @@ public class DatabaseController {
 
     // Endpoint to retrieve an item from a table.
     // GET http://localhost:8080/api/v1/tables/Users/items/user123
-    @GetMapping("/tables/{tableName}/items/{partitionKey}")
+    @GetMapping("/tables/{tableName}/items/{partitionKey}/{sortKey}")
     public ResponseEntity<Item> getItem(
             @PathVariable String tableName, // @PathVariable gets the tableName directly from the url
-            @PathVariable String partitionKey) {
+            @PathVariable String partitionKey,
+            @PathVariable String sortKey) {
 
-        Optional<Item> item = storageService.getItem(tableName, partitionKey);
+        Optional<Item> item = storageService.getItem(tableName, partitionKey, sortKey);
         // A clean way to return the item if present, or a 404 Not Found otherwise.
         return item.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -57,12 +62,13 @@ public class DatabaseController {
 
     // Endpoint to delete an item from a table.
     // DELETE http://localhost:8080/api/v1/tables/Users/items/user123
-    @DeleteMapping("/tables/{tableName}/items/{partitionKey}")
+    @DeleteMapping("/tables/{tableName}/items/{partitionKey}/{sortKey}")
     public ResponseEntity<Void> deleteItem(
             @PathVariable String tableName,
-            @PathVariable String partitionKey) {
+            @PathVariable String partitionKey,
+            @PathVariable String sortKey) {
 
-        storageService.deleteItem(tableName, partitionKey);
+        storageService.deleteItem(tableName, partitionKey, sortKey);
         // A 204 No Content response is standard for a successful DELETE.
         return ResponseEntity.noContent().build();
     }

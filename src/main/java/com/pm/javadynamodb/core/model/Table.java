@@ -3,13 +3,15 @@ package com.pm.javadynamodb.core.model;
 import lombok.Getter;
 
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class Table {
     private final String tableName;
     private final String partitionKeyName;
-    private final Map<String, Item> items;
+    private final String sortKeyName;
+    private final Map<String, SortedMap<String, Item>> items;
 
     /**
      * The actual data store for this table.
@@ -19,9 +21,10 @@ public class Table {
      * Value: The full Item object.
      */
 
-    public Table(String tableName, String partitionKeyName) {
+    public Table(String tableName, String partitionKeyName, String sortKeyName) {
         this.tableName = tableName;
         this.partitionKeyName = partitionKeyName;
+        this.sortKeyName = sortKeyName;
         this.items = new ConcurrentHashMap<>();
     }
 }

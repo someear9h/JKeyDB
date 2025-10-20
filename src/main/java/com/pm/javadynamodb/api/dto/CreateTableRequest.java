@@ -6,4 +6,5 @@ import lombok.Data;
 public class CreateTableRequest {
     private String tableName;
     private String partitionKeyName;
+    private String sortKeyName;
 }
