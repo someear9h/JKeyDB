@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Optional;
-import java.util.SortedMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Stream;
@@ -171,5 +169,29 @@ public class StorageService {
                 table.getItems().remove(partitionKey);
             }
         }
+    }
+
+    public Collection<Item> query(String tableName, String partitionKey, String startKey, String endKey) {
+        Table table = getTable(tableName);
+
+        SortedMap<String, Item> partition = table.getItems().get(partitionKey);
+
+        if(partition == null) {
+            // if partition doesnt exist, there are no items
+            return new ArrayList<>(); // return an empty list
+        }
+
+        // if no range is specified return all items in partition
+        if(startKey == null && endKey == null) {
+            return partition.values();
+        }
+
+        // If a range is specified, use the highly efficient subMap method.
+        // subMap returns a "view" of the original map, not a copy, which is very fast.
+        if(endKey == null) {
+            return partition.tailMap(startKey).values();
+        }
+
+        return partition.subMap(startKey, endKey).values();
     }
 }

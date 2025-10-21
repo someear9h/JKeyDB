@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -71,5 +72,16 @@ public class DatabaseController {
         storageService.deleteItem(tableName, partitionKey, sortKey);
         // A 204 No Content response is standard for a successful DELETE.
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/tables/{tableName}/items")
+    public ResponseEntity<Collection<Item>> queryItems(
+            @PathVariable String tableName, @RequestParam String partitionKey,
+            @RequestParam(required = false) String startKey,
+            @RequestParam(required = false) String endKey
+    ) {
+        Collection<Item> items = storageService.query(tableName, partitionKey, startKey, endKey);
+
+        return ResponseEntity.ok(items);
     }
 }

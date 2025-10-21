@@ -89,3 +89,17 @@ GET {{baseUrl}}/tables/{{tableName}}/items/{{pkValue1}}/{{skValue1}}
 # This GET request should still work and return a 200 OK.
 GET {{baseUrl}}/tables/{{tableName}}/items/{{pkValue2}}/{{skValue2}}
 
+### --------------------------------------------------
+# 8. Query for ALL items in a partition
+#
+# This fetches all songs for the artist "Daft Punk".
+# It uses a URL query parameter `?partitionKey=...`
+GET {{baseUrl}}/tables/{{tableName}}/items?partitionKey={{pkValue1}}
+
+### --------------------------------------------------
+# 9. Query for a RANGE of items
+#
+# Fetches all songs by Daft Punk whose titles are alphabetically
+# between "Harder..." and "One More Time".
+# In this case, it should just return "Harder, Better, Faster, Stronger".
+GET {{baseUrl}}/tables/{{tableName}}/items?partitionKey={{pkValue1}}&startKey=H&endKey=O
