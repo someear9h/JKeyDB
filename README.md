@@ -58,17 +58,20 @@ This architecture is implemented through three main components:
 
 ## Showcase Screenshots
 
-### 1️⃣ JKeyDB Architecture
-> will be added soon
+### 1. JKeyDB System Architecture
 
+![JKeyDB Architecture Diagram](assets/architecture.png)
 
-### 2️⃣ API in Action
-> added soon -> Open `api-requests.http` file in IntelliJ and run a query request that fetches a list of songs.
+### 2. The Write-Ahead Log (Proof of Durability)
+![JKeyDB Write-Ahead Log](assets/wal1.png)
+![JKeyDB Write-Ahead Log](assets/wal2.png)
 
+### 3. The High-Performance Query API in Action
+![JKeyDB Query API Result](assets/query-api.png)
+![JKeyDB Query API Result](assets/query-response.png)
 
-### 3️⃣ The Write-Ahead Log (Proof of Durability)
-> added soon -> Open `wal.log` in your editor — it should contain JSON entries for CREATE_TABLE, PUT_ITEM, DELETE_ITEM.
-
+### 4. State Recovery on Startup (Proof of Fault Tolerance)
+![JKeyDB State Recovery](assets/wal-startup.png)
 
 
 ## 🚀 Getting Started
