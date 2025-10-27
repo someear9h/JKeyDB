@@ -83,7 +83,7 @@ This architecture is implemented through three main components:
 ### ▶️ Running the Application
 
 # Clone the repository
-> git clone https://github.com/your-username/JKeyDB.git
+> git clone https://github.com/someear9h/JKeyDB.git
 > 
 > cd JKeyDB
 
