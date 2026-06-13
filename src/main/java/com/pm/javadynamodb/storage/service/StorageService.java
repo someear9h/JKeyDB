@@ -63,18 +63,23 @@ public class StorageService {
      * This logic is used by the startup replay.
      */
     private void applyLogEntry(WALEntry entry) {
-        if (entry.operationType() == OperationType.CREATE_TABLE) {
-            // Call the "Librarian" directly to avoid re-logging.
-            performCreateTable(entry.tableName(), entry.partitionKeyName(), entry.sortKeyName());
-        } else if (entry.operationType() == OperationType.PUT_ITEM) {
-            performPut(entry.tableName(), entry.item());
-        } else if (entry.operationType() == OperationType.DELETE_ITEM) {
-            Key key = entry.item().getPrimaryKey();
-            if (key != null) {
-                performDelete(entry.tableName(), key.getPartitionKey(), key.getSortKey());
+        switch (entry.operationType()) {
+            case CREATE_TABLE -> {
+                // Call the "Librarian" directly to avoid re-logging.
+                performCreateTable(entry.tableName(), entry.partitionKeyName(), entry.sortKeyName());
             }
+            case PUT_ITEM -> performPut(entry.tableName(), entry.item());
+            case DELETE_ITEM -> {
+                Key key = entry.item().getPrimaryKey();
+                if (key != null) {
+                    performDelete(entry.tableName(), key.getPartitionKey(), key.getSortKey());
+                }
+            }
+            case DELETE_TABLE -> performDeleteTable(entry.tableName());
         }
     }
+
+    // --------------------Tables------------------------------------
 
     private void performCreateTable(String tableName, String partitionKeyName, String sortKeyName) {
         tables.put(tableName, new Table(tableName, partitionKeyName, sortKeyName));
@@ -101,6 +106,20 @@ public class StorageService {
         } else {
             System.out.println("Table '" + tableName + "' already exists.");
         }
+    }
+
+    public void deleteTable(String tableName) {
+        if(!tables.containsKey(tableName)) {
+            System.out.printf("Table %s does not exist!\n", tableName);
+            return;
+        }
+        walService.log(WALEntry.forTableDeletion(tableName));
+        performDeleteTable(tableName);
+        System.out.printf("Table '%s' deleted successfully\n", tableName);
+    }
+
+    private void performDeleteTable(String tableName) {
+        tables.remove(tableName);
     }
 
     public Item putItem(String tableName, Item item) {

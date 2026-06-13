@@ -1,9 +1,7 @@
 package com.pm.javadynamodb.api.controller;
 
-import com.pm.javadynamodb.api.dto.CreateTableRequest;
 import com.pm.javadynamodb.core.model.Item;
 import com.pm.javadynamodb.storage.service.StorageService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,18 +19,6 @@ public class DatabaseController {
 
     public DatabaseController(StorageService storageService) {
         this.storageService = storageService;
-    }
-
-    // endpoint to create a new table
-    // POST http://localhost:8080/api/v1/tables
-    @PostMapping("/tables")
-    public ResponseEntity<Void> createTable(@RequestBody CreateTableRequest request) {
-        storageService.createTable(
-                request.getTableName(),
-                request.getPartitionKeyName(),
-                request.getSortKeyName());
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // Endpoint to add or update an item in a table.
