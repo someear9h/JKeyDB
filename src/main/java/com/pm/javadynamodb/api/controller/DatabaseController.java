@@ -1,9 +1,7 @@
 package com.pm.javadynamodb.api.controller;
 
-import com.pm.javadynamodb.api.dto.CreateTableRequest;
 import com.pm.javadynamodb.core.model.Item;
 import com.pm.javadynamodb.storage.service.StorageService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
