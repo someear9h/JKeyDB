@@ -23,18 +23,6 @@ public class DatabaseController {
         this.storageService = storageService;
     }
 
-    // endpoint to create a new table
-    // POST http://localhost:8080/api/v1/tables
-    @PostMapping("/tables")
-    public ResponseEntity<Void> createTable(@RequestBody CreateTableRequest request) {
-        storageService.createTable(
-                request.getTableName(),
-                request.getPartitionKeyName(),
-                request.getSortKeyName());
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     // Endpoint to add or update an item in a table.
     // POST http://localhost:8080/api/v1/tables/Users/items
     @PostMapping("/tables/{tableName}/items")

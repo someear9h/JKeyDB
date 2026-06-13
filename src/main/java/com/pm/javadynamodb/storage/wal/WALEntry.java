@@ -26,4 +26,9 @@ public record WALEntry(
     public static WALEntry forTable(String table, String pkName, String skName) {
         return new WALEntry(OperationType.CREATE_TABLE, table, pkName, skName, null);
     }
+
+    public static WALEntry forTableDeletion(String table) {
+        return new WALEntry(OperationType.DELETE_TABLE, table,
+                null, null, null);
+    }
 }

@@ -2,3 +2,9 @@
 {"operationType":"PUT_ITEM","tableName":"Music","item":{"primaryKey":null,"attributes":{"Artist":"Daft Punk","SongTitle":"One More Time","Album":"Discovery","Year":2001}}}
 {"operationType":"PUT_ITEM","tableName":"Music","item":{"primaryKey":null,"attributes":{"Artist":"Daft Punk","SongTitle":"Harder Better Faster Stronger","Album":"Discovery","Year":2001}}}
 {"operationType":"DELETE_ITEM","tableName":"Music","item":{"primaryKey":{"partitionKey":"Daft Punk","sortKey":"One More Time"},"attributes":{"Artist":"Daft Punk","SongTitle":"One More Time","Album":"Discovery","Year":2001}}}
+{"operationType":"CREATE_TABLE","tableName":"cars","partitionKeyName":"white","sortKeyName":"SongTitle"}
+{"operationType":"DELETE_TABLE","tableName":"cars"}
+{"operationType":"CREATE_TABLE","tableName":"cars","partitionKeyName":"white","sortKeyName":"ferrari"}
+{"operationType":"DELETE_TABLE","tableName":"cars"}
+{"operationType":"PUT_ITEM","tableName":"Music","item":{"primaryKey":null,"attributes":{"Artist":"Daft Punk","SongTitle":"Starboy","Album":"Starboy","Year":2016}}}
+{"operationType":"DELETE_ITEM","tableName":"Music","item":{"primaryKey":{"partitionKey":"Daft Punk","sortKey":"Starboy"},"attributes":{"Artist":"Daft Punk","SongTitle":"Starboy","Album":"Starboy","Year":2016}}}
