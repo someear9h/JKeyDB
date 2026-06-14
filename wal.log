@@ -1,10 +1,6 @@
-{"operationType":"CREATE_TABLE","tableName":"Music","partitionKeyName":"Artist","sortKeyName":"SongTitle"}
-{"operationType":"PUT_ITEM","tableName":"Music","item":{"primaryKey":null,"attributes":{"Artist":"Daft Punk","SongTitle":"One More Time","Album":"Discovery","Year":2001}}}
-{"operationType":"PUT_ITEM","tableName":"Music","item":{"primaryKey":null,"attributes":{"Artist":"Daft Punk","SongTitle":"Harder Better Faster Stronger","Album":"Discovery","Year":2001}}}
-{"operationType":"DELETE_ITEM","tableName":"Music","item":{"primaryKey":{"partitionKey":"Daft Punk","sortKey":"One More Time"},"attributes":{"Artist":"Daft Punk","SongTitle":"One More Time","Album":"Discovery","Year":2001}}}
-{"operationType":"CREATE_TABLE","tableName":"cars","partitionKeyName":"white","sortKeyName":"SongTitle"}
-{"operationType":"DELETE_TABLE","tableName":"cars"}
-{"operationType":"CREATE_TABLE","tableName":"cars","partitionKeyName":"white","sortKeyName":"ferrari"}
-{"operationType":"DELETE_TABLE","tableName":"cars"}
-{"operationType":"PUT_ITEM","tableName":"Music","item":{"primaryKey":null,"attributes":{"Artist":"Daft Punk","SongTitle":"Starboy","Album":"Starboy","Year":2016}}}
-{"operationType":"DELETE_ITEM","tableName":"Music","item":{"primaryKey":{"partitionKey":"Daft Punk","sortKey":"Starboy"},"attributes":{"Artist":"Daft Punk","SongTitle":"Starboy","Album":"Starboy","Year":2016}}}
+{"operationType":"CREATE_TABLE","tableName":"CODING","partitionKeyName":"CP_DSA","sortKeyName":"FileName"}
+{"operationType":"DELETE_TABLE","tableName":"CODING"}
+{"operationType":"CREATE_TABLE","tableName":"Projects","partitionKeyName":"Java_Projects","sortKeyName":"JKeyDB"}
+{"operationType":"DELETE_TABLE","tableName":"Projects"}
+{"operationType":"CREATE_TABLE","tableName":"PRs","partitionKeyName":"Authors","sortKeyName":"PRNumber"}
+{"operationType":"PUT_ITEM","tableName":"PRs","item":{"primaryKey":null,"attributes":{"Authors":"someear9h","PRNumber":1662,"Type":"Bug Fix","Verdict":"MERGED"}}}

@@ -11,6 +11,9 @@ public class Table {
     private final String tableName;
     private final String partitionKeyName;
     private final String sortKeyName;
+
+    // Key = partition key, value = kept items Sorted
+    // SortedMap key = SortKey, value = Item
     private final Map<String, SortedMap<String, Item>> items;
 
     /**
