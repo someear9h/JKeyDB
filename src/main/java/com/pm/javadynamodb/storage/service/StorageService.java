@@ -23,7 +23,20 @@ public class StorageService {
 
     private static final String WAL_FILE_NAME = "wal.log";
     // a thread safe map to hold all our tables. Key for this map is the table name
+    // this is the entire db
     private final Map<String, Table> tables = new ConcurrentHashMap<>();
+
+    /**
+    * Full Database structure explained with analogy
+    *
+    * there is a hotel with many buildings and then 1 building is a table and a floor is the
+    * partition key and the exact room number is sort key.
+    * and the item is a guest in the room. and the guest's name, age, and details are the attributes
+    * if yes then why the Map<String, Object> attributes; has String key? it is name of the attribute
+    * like String = luggage and Value (object) as list ["sunscreen", "laptop", "clothes"]
+    * and every item is given a primary key(partition and sortKey) to locate where the guests (items) are
+    */
+
     private final WALService walService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -79,14 +92,14 @@ public class StorageService {
         }
     }
 
-    // --------------------Tables------------------------------------
+    // -------------------- Tables ------------------------------------
 
     private void performCreateTable(String tableName, String partitionKeyName, String sortKeyName) {
         tables.put(tableName, new Table(tableName, partitionKeyName, sortKeyName));
         System.out.println("Table '" + tableName + "' replayed/created successfully.");
     }
 
-    private Table getTable(String tableName) {
+    public Table getTable(String tableName) {
         Table table = tables.get(tableName);
 
         if(table == null) {
@@ -122,7 +135,21 @@ public class StorageService {
         tables.remove(tableName);
     }
 
+    // -------------------- Items ------------------------------------
+
     public Item putItem(String tableName, Item item) {
+        Table table = getTable(tableName);
+        String pkName = table.getPartitionKeyName();
+
+        if(item.getAttributes().get(pkName) == null) {
+            throw new IllegalArgumentException("Item is missing partition key " + pkName);
+        }
+
+        String skName = table.getSortKeyName();
+        if(skName != null && item.getAttributes().get(skName) == null) {
+            throw new IllegalArgumentException("Item is missing sort key " + skName);
+        }
+
         walService.log(WALEntry.forItem(OperationType.PUT_ITEM, tableName, item));
         return performPut(tableName, item);
     }
@@ -153,19 +180,15 @@ public class StorageService {
         String pkName = table.getPartitionKeyName();
         String skName = table.getSortKeyName();
 
-        Object pkValue = item.getAttributes().get(pkName);
-        Object skValue = item.getAttributes().get(skName);
+        String partitionKey = item.getAttributes().get(pkName).toString();
+        String sortKey = "SINGLE_KEY_ITEM";
 
-        if(pkValue == null || skValue == null) {
-            throw new IllegalArgumentException("Item is missing partition or sort key");
+        if(skName != null) {
+            sortKey = item.getAttributes().get(skName).toString();
         }
-
-        String partitionKey = pkValue.toString();
-        String sortKey = skValue.toString();
 
         item.setPrimaryKey(new Key(partitionKey, sortKey));
 
-        // Get the partition (the inner map). If it doesn't exist, create it.
         SortedMap<String, Item> partition = table.getItems()
                 .computeIfAbsent(partitionKey, k -> new ConcurrentSkipListMap<>());
 

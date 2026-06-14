@@ -1,15 +1,21 @@
 package com.pm.javadynamodb.api.controller;
 
 import com.pm.javadynamodb.api.dto.CreateTableRequest;
+import com.pm.javadynamodb.api.dto.TableResponse;
+import com.pm.javadynamodb.core.model.Item;
+import com.pm.javadynamodb.core.model.Table;
 import com.pm.javadynamodb.storage.service.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tables")
@@ -36,5 +42,17 @@ public class TableController {
     public ResponseEntity<Void> deleteTable(@PathVariable String tableName) {
         storageService.deleteTable(tableName);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{tableName}")
+    public ResponseEntity<TableResponse> getTable(@PathVariable String tableName) {
+        Table table = storageService.getTable(tableName);
+
+        List<Item> allItemsInTable = table.getItems().values().stream()
+                .flatMap(sortedMap -> sortedMap.values().stream())
+                .toList();
+
+        TableResponse response = new TableResponse(tableName, allItemsInTable);
+        return ResponseEntity.ok(response);
     }
 }
